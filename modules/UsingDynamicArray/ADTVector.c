@@ -167,3 +167,7 @@ VectorNode vector_find_node(Vector vec, Pointer value, CompareFunc compare) {
 
 	return VECTOR_EOF;				// δεν υπάρχει
 }
+
+int vector_steps(Vector vector){
+	return 0;
+}
