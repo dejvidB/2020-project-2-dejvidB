@@ -26,13 +26,12 @@ void test_create(void) {
 void test_insert(void) {
 	BList blist = blist_create(NULL);
 	
-	// Θα προσθέτουμε, μέσω της insert, δείκτες ως προς τα στοιχεία του π΄ίνακα
+	// Θα προσθέτουμε, μέσω της insert, δείκτες ως προς τα στοιχεία του πίνακα
 	int N = 1000;
 	int array[N];					
 
-	blist_insert(blist, BLIST_EOF, &array[0]);
-	for (int i = 1; i < N; i++) {
-		// LIST_BOF για εισαγωγή στην αρχή
+	for (int i = 0; i < N; i++) {
+		// blist_first για εισαγωγή στην αρχή
 		blist_insert(blist, blist_first(blist), &array[i]);
 		
 		// Ελέγχουμε εάν ενημερώθηκε (αυξήθηκε) το μέγεθος της λίστας.
@@ -65,10 +64,7 @@ void test_remove(void) {
 	int* array[N];
 
 	// Χρησιμοποιούμε την insert για να γεμίσουμε την λίστα, αφού την έχουμε δοκιμάσει ήδη στην test_insert()
-	array[0]  = malloc(sizeof(int));
-	*array[0] = 0;
-	blist_insert(blist, BLIST_EOF, array[0]);
-	for (int i = 1; i < N; i++) {
+	for (int i = 0; i < N; i++) {
 		// Δημιουργούμε δυναμικά δεσμευμένα αντικείμενα για να δοκιμάσουμε την destroy_function
 		array[i]  = malloc(sizeof(int));
 		*array[i] = i;
@@ -87,10 +83,7 @@ void test_remove(void) {
 	}
 	
 	// Ξαναγεμίζουμε την λίστα για να δοκιμάσουμε την διαγραφή απο ενδιάμεσο κόμβο
-	array[0]  = malloc(sizeof(int));
-	*array[0] = 0;
-	blist_insert(blist, BLIST_EOF, array[0]);
-	for (int i = 1; i < N; i++) {
+	for (int i = 0; i < N; i++) {
 		array[i]  = malloc(sizeof(int));
 		*array[i] = i;
 		blist_insert(blist, blist_first(blist), array[i]);
@@ -126,7 +119,7 @@ void test_find() {
 	}
 
 	// Δοκιμάζουμε, για μια τυχαία τιμή που δεν μπορεί πιθανώς να υπάρχει στην λίστα,
-	// αν η list_find γυρνάει σωστά NULL pointer
+	// αν η blist_find γυρνάει σωστά NULL pointer
 	int not_exists = -1;
 	TEST_ASSERT(blist_find(blist, &not_exists, compare_ints) == NULL);
 
@@ -149,7 +142,7 @@ void test_find_node() {
 	BListNode node = blist_first(blist);
 
 	for (int i = N - 1; i >= 0; i--) {
-		// Ελέγχουμε ότι η list_find_node βρίσκει σωστά τον πρώτο κόμβο με value τον δείκτη &array[i].
+		// Ελέγχουμε ότι η blist_find_node βρίσκει σωστά τον πρώτο κόμβο με value τον δείκτη &array[i].
 		// Σε αυτή την λίστα, δοκιμάζουμε ότι ο πρώτος κόμβος περιέχει τον δείκτη &array[N - 1], 
 		// o δεύτερος τον &array[998] κοκ
 		BListNode found_node = blist_find_node(blist, &i, compare_ints); 

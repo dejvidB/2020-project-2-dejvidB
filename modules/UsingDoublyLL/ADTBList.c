@@ -12,8 +12,7 @@
 
 // Ενα BList είναι pointer σε αυτό το struct
 struct blist {
-	BListNode dummy;				// χρησιμοποιούμε dummy κόμβο, ώστε ακόμα και η κενή λίστα να έχει έναν κόμβο.
-	//BListNode first;				// δείκτης στον τελευταίο κόμβο, ή στον dummy (αν η λίστα είναι κενή)
+	BListNode dummy;			// χρησιμοποιούμε dummy κόμβο, ώστε ακόμα και η κενή λίστα να έχει έναν κόμβο.
 	BListNode last;				// δείκτης στον τελευταίο κόμβο, ή στον dummy (αν η λίστα είναι κενή)
 	int size;					// μέγεθος, ώστε η list_size να είναι Ο(1)
 	DestroyFunc destroy_value;	// Συνάρτηση που καταστρέφει ένα στοιχείο της λίστας.
@@ -21,7 +20,7 @@ struct blist {
 
 struct blist_node {
 	BListNode next;		// Δείκτης στον επόμενο
-	BListNode previous;
+	BListNode previous; // Δείκτης στον προηγούμενο
 	Pointer value;		// Η τιμή που αποθηκεύουμε στον κόμβο
 };
 
@@ -37,7 +36,7 @@ BList blist_create(DestroyFunc destroy_value) {
 	//
 	blist->dummy = malloc(sizeof(*blist->dummy));
 	blist->dummy->next = NULL;		// άδεια λίστα, ο dummy δεν έχει επόμενο
-	blist->dummy->previous = NULL;
+	blist->dummy->previous = NULL;  // και σίγουρα δεν έχει πρηγούμενο
 	
 	// Σε μια κενή λίστα, τελευταίος κόμβος είναι επίσης ο dummy
 	blist->last = blist->dummy;
@@ -55,12 +54,19 @@ void blist_insert(BList blist, BListNode node, Pointer value) {
 	new->value = value;
 
 	if(node == BLIST_EOF){
-		new->next = BLIST_EOF;
-		new->previous = blist->last;
-		blist->last->next = new;
-		blist->last = new;
+		if(blist->dummy->next == NULL){ // Αν η λίστα είναι άδεια, τότε ο κόμβος που προστίθεται είναι ο πρώτος
+			blist->dummy->next = new;
+			new->previous = blist->dummy;
+			new->next = BLIST_EOF;
+			blist->last = new;
+		}else{
+			new->next = BLIST_EOF;
+			new->previous = blist->last;
+			blist->last->next = new;
+			blist->last = new;
+		}
 	}else{
-		// Σύνδεση του new ανάμεσα στο node και το node->next
+		// Σύνδεση του new ανάμεσα στο node, το node->next και το node->previous
 		new->next = node;
 		new->previous = node->previous;
 
@@ -78,13 +84,15 @@ void blist_remove(BList blist, BListNode node) {
 	if (blist->destroy_value != NULL)
 		blist->destroy_value(node->value);
 
+	// Σύνδεση του προηγούμενου κόμβου του node με τον επόμενο κόμβο του node
 	node->previous->next = node->next;
-	if (node->next != BLIST_EOF)
-		node->next->previous = node->previous;
-	else
-		blist->last = node->previous;
 
-	blist->size--;
+	if (node->next != BLIST_EOF)  // Αν ο node δεν είναι ο τελευταίος κόμβος
+		node->next->previous = node->previous;  // Σύνδεση του επόμενου κόμβου με τον προηγούμενο του node
+	else
+		blist->last = node->previous; // Ενημέρωση του blist->last με τον νέο τελευταίο κόμβο
+
+	blist->size--; //Ενημέρωση του size
 	free(node);
 }
 
