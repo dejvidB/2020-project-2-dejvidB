@@ -13,6 +13,7 @@
 // Ενα BList είναι pointer σε αυτό το struct
 struct blist {
 	BListNode dummy;				// χρησιμοποιούμε dummy κόμβο, ώστε ακόμα και η κενή λίστα να έχει έναν κόμβο.
+	//BListNode first;				// δείκτης στον τελευταίο κόμβο, ή στον dummy (αν η λίστα είναι κενή)
 	BListNode last;				// δείκτης στον τελευταίο κόμβο, ή στον dummy (αν η λίστα είναι κενή)
 	int size;					// μέγεθος, ώστε η list_size να είναι Ο(1)
 	DestroyFunc destroy_value;	// Συνάρτηση που καταστρέφει ένα στοιχείο της λίστας.
@@ -73,19 +74,16 @@ void blist_insert(BList blist, BListNode node, Pointer value) {
 
 void blist_remove(BList blist, BListNode node) {
 	assert(node != NULL);
-	if (node == NULL)
-		return;
 
 	if (blist->destroy_value != NULL)
-		blist->destroy_value(node);
+		blist->destroy_value(node->value);
 
 	node->previous->next = node->next;
-
-	// Ενημέρωση των size & last
-	if (blist->last == node)
-		blist->last = node->previous;
-	else
+	if (node->next != BLIST_EOF)
 		node->next->previous = node->previous;
+	else
+		blist->last = node->previous;
+
 	blist->size--;
 	free(node);
 }
