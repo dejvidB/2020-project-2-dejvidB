@@ -19,7 +19,7 @@ UsingHeap_ADTPriorityQueue_test_OBJS    = ADTPriorityQueue_test.o $(MODULES)/Usi
 UsingBinarySearchTree_ADTSet_test_OBJS  = ADTSet_test.o $(MODULES)/UsingBinarySearchTree/ADTSet.o
 
 # Υλοποιήσεις μέσω Set: ADTPriorityQueue
-UsingADTSet_ADTPriorityQueue_OBJS       =  ADTPriorityQueue_test.o $(MODULES)/UsingADTSet/ADTPriorityQueue.o $(MODULES)/UsingBinarySearchTree/ADTSet.o $(MODULES)/UsingDynamicArray/ADTVector.o
+UsingADTSet_ADTPriorityQueue_test_OBJS       =  ADTPriorityQueue_test.o $(MODULES)/UsingADTSet/ADTPriorityQueue.o $(MODULES)/UsingBinarySearchTree/ADTSet.o $(MODULES)/UsingDynamicArray/ADTVector.o
 
 # Ο βασικός κορμός του Makefile
 include ../common.mk
