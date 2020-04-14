@@ -37,7 +37,7 @@ static Pointer node_value(PriorityQueue pqueue, int node_id) {
 	return ((PriorityQueueNode)vector_get_at(pqueue->vector, node_id - 1))->value;
 }
 
-static PriorityQueueNode node(PriorityQueue pqueue, int node_id) {
+static PriorityQueueNode pqnode(PriorityQueue pqueue, int node_id) {
 	return (PriorityQueueNode)vector_get_at(pqueue->vector, node_id - 1);
 }
 
@@ -45,8 +45,8 @@ static PriorityQueueNode node(PriorityQueue pqueue, int node_id) {
 
 static void node_swap(PriorityQueue pqueue, int node_id1, int node_id2) {
 	// τα node_ids είναι 1-based, το node_id αποθηκεύεται στη θέση node_id - 1
-	PriorityQueueNode node1 = node(pqueue, node_id1);
-	PriorityQueueNode node2 = node(pqueue, node_id2);
+	PriorityQueueNode node1 = pqnode(pqueue, node_id1);
+	PriorityQueueNode node2 = pqnode(pqueue, node_id2);
 
 	int pos1 = node1->position;
 	
@@ -190,11 +190,11 @@ DestroyFunc pqueue_set_destroy_value(PriorityQueue pqueue, DestroyFunc destroy_v
 }
 
 void pqueue_destroy(PriorityQueue pqueue) {
-	for(VectorNode node = vector_first(pqueue->vector); node != VECTOR_EOF; node = vector_next(pqueue->vector, node))
-		pqueue->destroy_value(((PriorityQueueNode)node)->value);
-	vector_set_destroy_value(pqueue->vector, free);
-	vector_destroy(pqueue->vector);
-	free(pqueue);
+	// for(VectorNode node = vector_first(pqueue->vector); node != VECTOR_EOF; node = vector_next(pqueue->vector, node))
+	// 	pqueue->destroy_value(((PriorityQueueNode)node)->value);
+	// vector_set_destroy_value(pqueue->vector, free);
+	// vector_destroy(pqueue->vector);
+	// free(pqueue);
 }
 
 
@@ -211,7 +211,8 @@ void pqueue_remove_node(PriorityQueue pqueue, PriorityQueueNode node) {
 	pqueue->destroy_value(node->value);
 	free(node);
 	vector_remove_last(pqueue->vector);
-	pqueue_update_order(pqueue, node);
+	if(pqueue_size(pqueue))
+		pqueue_update_order(pqueue, pqnode(pqueue, pos));
 }
 
 void pqueue_update_order(PriorityQueue pqueue, PriorityQueueNode node) {
