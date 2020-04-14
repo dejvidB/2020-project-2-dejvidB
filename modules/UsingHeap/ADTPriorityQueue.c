@@ -175,6 +175,7 @@ void pqueue_remove_max(PriorityQueue pqueue) {
 
 	// Αντικαθιστούμε τον πρώτο κόμβο με τον τελευταίο και αφαιρούμε τον τελευταίο
 	node_swap(pqueue, 1, last_node);
+	//free(pqnode(pqueue, last_node));
 	vector_remove_last(pqueue->vector);
 
  	// Ολοι οι κόμβοι ικανοποιούν την ιδιότητα του σωρού εκτός από τη νέα ρίζα
@@ -190,9 +191,16 @@ DestroyFunc pqueue_set_destroy_value(PriorityQueue pqueue, DestroyFunc destroy_v
 }
 
 void pqueue_destroy(PriorityQueue pqueue) {
-	// for(VectorNode node = vector_first(pqueue->vector); node != VECTOR_EOF; node = vector_next(pqueue->vector, node))
-	// 	pqueue->destroy_value(((PriorityQueueNode)node)->value);
-	// vector_set_destroy_value(pqueue->vector, free);
+	// VectorNode temp = vector_first(pqueue->vector);
+	// if(pqueue->destroy_value != NULL){
+	// 	while(temp != VECTOR_EOF){
+	// 		VectorNode node = temp;
+	// 		temp = vector_next(pqueue->vector, temp);
+	// 		pqueue->destroy_value(((PriorityQueueNode)node)->value);
+	// 		free(node);
+	// 	}
+	// }
+	// //vector_set_destroy_value(pqueue->vector, NULL);
 	// vector_destroy(pqueue->vector);
 	// free(pqueue);
 }
