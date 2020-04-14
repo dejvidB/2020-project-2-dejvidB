@@ -190,11 +190,10 @@ DestroyFunc pqueue_set_destroy_value(PriorityQueue pqueue, DestroyFunc destroy_v
 }
 
 void pqueue_destroy(PriorityQueue pqueue) {
-	// Αντί να κάνουμε εμείς destroy τα στοιχεία, είναι απλούστερο να
-	// προσθέσουμε τη destroy_value στο vector ώστε να κληθεί κατά το vector_destroy.
-	vector_set_destroy_value(pqueue->vector, pqueue->destroy_value);
+	for(VectorNode node = vector_first(pqueue->vector); node != VECTOR_EOF; node = vector_next(pqueue->vector, node))
+		pqueue->destroy_value(((PriorityQueueNode)node)->value);
+	vector_set_destroy_value(pqueue->vector, free);
 	vector_destroy(pqueue->vector);
-
 	free(pqueue);
 }
 
@@ -207,7 +206,12 @@ Pointer pqueue_node_value(PriorityQueue set, PriorityQueueNode node) {
 }
 
 void pqueue_remove_node(PriorityQueue pqueue, PriorityQueueNode node) {
-
+	int pos = node->position;
+	node_swap(pqueue, pos, pqueue_size(pqueue));
+	pqueue->destroy_value(node->value);
+	free(node);
+	vector_remove_last(pqueue->vector);
+	pqueue_update_order(pqueue, node);
 }
 
 void pqueue_update_order(PriorityQueue pqueue, PriorityQueueNode node) {
