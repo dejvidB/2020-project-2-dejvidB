@@ -16,6 +16,7 @@ struct blist {
 	BListNode last;				// δείκτης στον τελευταίο κόμβο, ή στον dummy (αν η λίστα είναι κενή)
 	int size;					// μέγεθος, ώστε η list_size να είναι Ο(1)
 	DestroyFunc destroy_value;	// Συνάρτηση που καταστρέφει ένα στοιχείο της λίστας.
+	BListNode last_inserted;
 };
 
 struct blist_node {
@@ -23,6 +24,10 @@ struct blist_node {
 	BListNode previous; // Δείκτης στον προηγούμενο
 	Pointer value;		// Η τιμή που αποθηκεύουμε στον κόμβο
 };
+
+BListNode blist_last_inserted(BList blist){
+	return blist->last_inserted;
+}
 
 
 BList blist_create(DestroyFunc destroy_value) {
@@ -37,7 +42,7 @@ BList blist_create(DestroyFunc destroy_value) {
 	blist->dummy = malloc(sizeof(*blist->dummy));
 	blist->dummy->next = NULL;		// άδεια λίστα, ο dummy δεν έχει επόμενο
 	blist->dummy->previous = NULL;  // και σίγουρα δεν έχει πρηγούμενο
-	
+	blist->last_inserted = NULL;
 	// Σε μια κενή λίστα, τελευταίος κόμβος είναι επίσης ο dummy
 	blist->last = blist->dummy;
 
@@ -73,7 +78,7 @@ void blist_insert(BList blist, BListNode node, Pointer value) {
 		new->previous->next = new;
 		node->previous = new;
 	}
-
+	blist->last_inserted = new;
 	// Ενημέρωση του size
 	blist->size++;
 }

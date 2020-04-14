@@ -83,3 +83,5 @@ Pointer blist_node_value(BList blist, BListNode node);
 // Επιστρέφει τον κόμβο του στοιχείου, ή BLIST_EOF αν δεν βρεθεί.
 
 BListNode blist_find_node(BList blist, Pointer value, CompareFunc compare);
+
+BListNode blist_last_inserted(BList blist);
