@@ -50,7 +50,9 @@ PriorityQueueNode pqueue_insert(PriorityQueue pqueue, Pointer value) {
 }
 
 void pqueue_remove_max(PriorityQueue pqueue) {
+	DestroyFunc old_destroy = set_set_destroy_value(pqueue->set, pqueue->destroy_value);
 	set_remove(pqueue->set, set_node_value(pqueue->set, set_last(pqueue->set)));
+	set_set_destroy_value(pqueue->set, old_destroy);
 }
 
 DestroyFunc pqueue_set_destroy_value(PriorityQueue pqueue, DestroyFunc destroy_value) {
@@ -74,7 +76,9 @@ Pointer pqueue_node_value(PriorityQueue set, PriorityQueueNode node) {
 }
 
 void pqueue_remove_node(PriorityQueue pqueue, PriorityQueueNode node) {
+	DestroyFunc old_destroy = set_set_destroy_value(pqueue->set, pqueue->destroy_value);
     set_remove(pqueue->set, set_node_value(pqueue->set, (SetNode)node));
+	set_set_destroy_value(pqueue->set, old_destroy);
 }
 
 void pqueue_update_order(PriorityQueue pqueue, PriorityQueueNode node) {
