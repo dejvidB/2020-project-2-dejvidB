@@ -40,7 +40,7 @@ void amortized(){
     for(int n = 1; n <= 10000; n++){
         vector_insert_last(test_vec, create_int(n));
         steps += vector_steps(test_vec);
-        printf("%d,%d\n", n, steps/n);
+        printf("%d,%f\n", n, (float)steps/n);
     }
     vector_destroy(test_vec);
 }
