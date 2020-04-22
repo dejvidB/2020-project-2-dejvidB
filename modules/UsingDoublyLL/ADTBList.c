@@ -16,7 +16,6 @@ struct blist {
 	BListNode last;				// δείκτης στον τελευταίο κόμβο, ή στον dummy (αν η λίστα είναι κενή)
 	int size;					// μέγεθος, ώστε η list_size να είναι Ο(1)
 	DestroyFunc destroy_value;	// Συνάρτηση που καταστρέφει ένα στοιχείο της λίστας.
-	BListNode last_inserted;
 };
 
 struct blist_node {
@@ -24,11 +23,6 @@ struct blist_node {
 	BListNode previous; // Δείκτης στον προηγούμενο
 	Pointer value;		// Η τιμή που αποθηκεύουμε στον κόμβο
 };
-
-BListNode blist_last_inserted(BList blist){
-	return blist->last_inserted;
-}
-
 
 BList blist_create(DestroyFunc destroy_value) {
 	// Πρώτα δημιουργούμε το stuct
@@ -42,7 +36,6 @@ BList blist_create(DestroyFunc destroy_value) {
 	blist->dummy = malloc(sizeof(*blist->dummy));
 	blist->dummy->next = NULL;		// άδεια λίστα, ο dummy δεν έχει επόμενο
 	blist->dummy->previous = NULL;  // και σίγουρα δεν έχει πρηγούμενο
-	blist->last_inserted = NULL;
 	// Σε μια κενή λίστα, τελευταίος κόμβος είναι επίσης ο dummy
 	blist->last = blist->dummy;
 
@@ -53,19 +46,19 @@ int blist_size(BList blist) {
 	return blist->size;
 }
 
-void blist_insert(BList blist, BListNode node, Pointer value) {
+BListNode blist_insert(BList blist, BListNode node, Pointer value) {
 	// Δημιουργία του νέου κόμβου
 	BListNode new = malloc(sizeof(*new));
 	new->value = value;
 
 	if(node == BLIST_EOF){
 		if(blist->dummy->next == NULL){ // Αν η λίστα είναι άδεια, τότε ο κόμβος που προστίθεται είναι ο πρώτος
-			blist->dummy->next = new;
+			blist->dummy->next = new;   // Σύνδεση dummy <--> new
 			new->previous = blist->dummy;
 			new->next = BLIST_EOF;
 			blist->last = new;
-		}else{
-			new->next = BLIST_EOF;
+		}else{							// αλλιώς είναι ο τελευταίος
+			new->next = BLIST_EOF;		// Σύνδεση τελευταίου στοιχείου με new
 			new->previous = blist->last;
 			blist->last->next = new;
 			blist->last = new;
@@ -78,9 +71,9 @@ void blist_insert(BList blist, BListNode node, Pointer value) {
 		new->previous->next = new;
 		node->previous = new;
 	}
-	blist->last_inserted = new;
 	// Ενημέρωση του size
 	blist->size++;
+	return new;
 }
 
 void blist_remove(BList blist, BListNode node) {

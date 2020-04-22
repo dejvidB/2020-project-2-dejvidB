@@ -17,9 +17,10 @@ struct priority_queue {
 	DestroyFunc destroy_value;	// Συνάρτηση που καταστρέφει ένα στοιχείο του vector.
 };
 
+// Ενα PriorityQueueNode είναι pointer σε αυτό το struct
 struct priority_queue_node {
 	Pointer value;
-	int position;
+	int position; // H θέση του node στο δέντρο, η οποία ανανεώνεται σε κάθε node_swap.
 };
 
 // Βοηθητικές συναρτήσεις ////////////////////////////////////////////////////////////////////////////
@@ -37,17 +38,19 @@ static Pointer node_value(PriorityQueue pqueue, int node_id) {
 	return ((PriorityQueueNode)vector_get_at(pqueue->vector, node_id - 1))->value;
 }
 
+// Επιστρέφει το PriorityQueueNode στην θέση node_id
 static PriorityQueueNode pqnode(PriorityQueue pqueue, int node_id) {
 	return (PriorityQueueNode)vector_get_at(pqueue->vector, node_id - 1);
 }
 
-// Ανταλλάσει τις τιμές των κόμβων node_id1 και node_id2
+// Ανταλλάσει τους κόμβους node_id1 και node_id2
 
 static void node_swap(PriorityQueue pqueue, int node_id1, int node_id2) {
 	// τα node_ids είναι 1-based, το node_id αποθηκεύεται στη θέση node_id - 1
 	PriorityQueueNode node1 = pqnode(pqueue, node_id1);
 	PriorityQueueNode node2 = pqnode(pqueue, node_id2);
 
+	// Ενημέρωση θέσεων nodes
 	int pos1 = node1->position;
 	
 	node1->position = node2->position;
@@ -200,7 +203,6 @@ void pqueue_destroy(PriorityQueue pqueue) {
 }
 
 
-
 //// Νέες συναρτήσεις για την εργασία 2 //////////////////////////////////////////
 
 Pointer pqueue_node_value(PriorityQueue set, PriorityQueueNode node) {
@@ -209,15 +211,16 @@ Pointer pqueue_node_value(PriorityQueue set, PriorityQueueNode node) {
 
 void pqueue_remove_node(PriorityQueue pqueue, PriorityQueueNode node) {
 	int pos = node->position;
-	node_swap(pqueue, pos, pqueue_size(pqueue));
+	node_swap(pqueue, pos, pqueue_size(pqueue));  // Ανταλλαγή τελευταίου κόμβου με τον node
 	pqueue->destroy_value(node->value);
 	free(node);
-	vector_remove_last(pqueue->vector);
-	if(pqueue_size(pqueue))
-		pqueue_update_order(pqueue, pqnode(pqueue, pos));
+	vector_remove_last(pqueue->vector); // Αφαίρεση node που πλέον βρίσκεται στο τέλος
+	if(pqueue_size(pqueue))  // Αν η λίστα περιέχει στοιχεία
+		pqueue_update_order(pqueue, pqnode(pqueue, pos)); // Update_order στον προηγούμενο παλιό κόμβο που ανταλλάχθηκε
 }
 
 void pqueue_update_order(PriorityQueue pqueue, PriorityQueueNode node) {
+	// Αν τιμή του κόμβου είναι μεγαλύτερη απ την τιμή του parent, bubble_up, αλλιώς bubble_down
 	if(node->position > 1 && node_value(pqueue, node->position) > node_value(pqueue, node->position / 2))
 		bubble_up(pqueue, node->position);
 	else

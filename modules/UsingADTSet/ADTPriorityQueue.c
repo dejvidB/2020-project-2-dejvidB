@@ -3,7 +3,6 @@
 // Υλοποίηση του ADT Priority Queue μέσω σωρού.
 //
 ///////////////////////////////////////////////////////////
-#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
@@ -45,13 +44,13 @@ Pointer pqueue_max(PriorityQueue pqueue) {
 }
 
 PriorityQueueNode pqueue_insert(PriorityQueue pqueue, Pointer value) {
-	set_insert(pqueue->set, value);
-    return (PriorityQueueNode)set_find_node(pqueue->set, value);
+	set_insert(pqueue->set, value);	// Εισαγωγή στo set
+    return (PriorityQueueNode)set_find_node(pqueue->set, value); // Εύρεση του στοιχείου που προστέθηκε και cast σε PriorityQueueNode
 }
 
 void pqueue_remove_max(PriorityQueue pqueue) {
 	DestroyFunc old_destroy = set_set_destroy_value(pqueue->set, pqueue->destroy_value);
-	set_remove(pqueue->set, set_node_value(pqueue->set, set_last(pqueue->set)));
+	set_remove(pqueue->set, set_node_value(pqueue->set, set_last(pqueue->set))); // Αφαίρεση του set_last, που είναι το μέγιστο με βάση την CompareFunc
 	set_set_destroy_value(pqueue->set, old_destroy);
 }
 

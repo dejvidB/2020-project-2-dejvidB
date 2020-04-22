@@ -24,7 +24,7 @@ struct vector {
 	int size;					// Πόσα στοιχεία έχουμε προσθέσει
 	int capacity;				// Πόσο χώρο έχουμε δεσμεύσει (το μέγεθος του array). Πάντα capacity >= size, αλλά μπορεί να έχουμε
 	DestroyFunc destroy_value;	// Συνάρτηση που καταστρέφει ένα στοιχείο του vector.
-	int steps_counter;
+	int steps_counter;			// Μετρητής βημάτων συναρτήσεων
 };
 
 
@@ -41,7 +41,7 @@ Vector vector_create(int size, DestroyFunc destroy_value) {
 	//
 	vec->capacity = size < VECTOR_MIN_CAPACITY ? VECTOR_MIN_CAPACITY : size;
 	vec->array = calloc(vec->capacity, sizeof(*vec->array));		// αρχικοποίηση σε 0 (NULL)
-	vec->steps_counter = vec->capacity;
+	vec->steps_counter = vec->capacity; // επειδή η calloc αρχικοποιεί σε 0, capacity στοιχεία
 	return vec;
 }
 
@@ -74,7 +74,7 @@ void vector_insert_last(Vector vec, Pointer value) {
 		// Προσοχή: δεν πρέπει να κάνουμε free τον παλιό pointer, το κάνει η realloc
 		vec->capacity *= 2;
 		vec->array = realloc(vec->array, vec->capacity * sizeof(*vec->array));
-		vec->steps_counter = vec->size + 1;
+		vec->steps_counter = vec->size + 1; // vec->size στοιχεία αντιγράφονται από την realloc και 1 βήμα για την εισαγωγή του νέου
 	}else{
 		vec->steps_counter = 1;
 	}
@@ -101,7 +101,7 @@ void vector_remove_last(Vector vec) {
 	if (vec->capacity > vec->size * 4 && vec->capacity > 2*VECTOR_MIN_CAPACITY) {
 		vec->capacity /= 2;
 		vec->array = realloc(vec->array, vec->capacity * sizeof(*vec->array));
-		vec->steps_counter += vec->size;
+		vec->steps_counter += vec->size; // αντιγραφή vec->size στοιχείων από την realloc
 	}
 }
 
@@ -109,7 +109,7 @@ Pointer vector_find(Vector vec, Pointer value, CompareFunc compare) {
 	// Διάσχιση του vector
 	vec->steps_counter = 0;
 	for (int i = 0; i < vec->size; i++){
-		vec->steps_counter++;
+		vec->steps_counter++; //Αύξηση μετρητή βημάτων
 		if (compare(vec->array[i].value, value) == 0)
 			return vec->array[i].value;		// βρέθηκε
 	}
@@ -130,7 +130,7 @@ void vector_destroy(Vector vec) {
 		for (int i = 0; i < vec->size; i++)
 			vec->destroy_value(vec->array[i].value);
 
-	vec->steps_counter = vec->size + 1;
+	vec->steps_counter = vec->size + 1; //vec->size στοιχεία διαγράφηκαν
 	// Πρέπει να κάνουμε free τόσο τον πίνακα όσο και το struct!
 	free(vec->array);
 	free(vec);			// τελευταίο το vec!
@@ -180,7 +180,7 @@ VectorNode vector_find_node(Vector vec, Pointer value, CompareFunc compare) {
 	// Διάσχιση του vector
 	vec->steps_counter = 0;
 	for (int i = 0; i < vec->size; i++){
-		vec->steps_counter++;
+		vec->steps_counter++;  //Αύξηση μετρητή βημάτων
 		if (compare(vec->array[i].value, value) == 0)
 			return &vec->array[i];		// βρέθηκε
 	}
