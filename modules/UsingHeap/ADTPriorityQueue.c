@@ -102,16 +102,6 @@ static void bubble_down(PriorityQueue pqueue, int node_id) {
 	}
 }
 
-// Αρχικοποιεί το σωρό από τα στοιχεία του vector values.
-
-// static void naive_heapify(PriorityQueue pqueue, Vector values) {
-// 	// Απλά κάνουμε insert τα στοιχεία ένα ένα.
-// 	// TODO: υπάρχει πιο αποδοτικός τρόπος να γίνει αυτό!
-// 	int size = vector_size(values);
-// 	for (int i = 0; i < size; i++)
-// 		pqueue_insert(pqueue, vector_get_at(values, i));
-// }
-
 static void efficient_heapify(PriorityQueue pqueue, Vector values){
 	for (int i = 0; i < vector_size(values); i++){
 		PriorityQueueNode node = malloc(sizeof(PriorityQueueNode));

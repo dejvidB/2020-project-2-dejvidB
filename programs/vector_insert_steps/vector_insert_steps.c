@@ -26,7 +26,7 @@ int main(int argc, char **argv){
 
 void real(){
     Vector test_vec = vector_create(0, free);
-    vector_insert_last(test_vec, create_int(0));
+    vector_insert_last(test_vec, create_int(0)); //there must be one element on first insertion
     for(int n = 1; n <= 10000; n++){
         vector_insert_last(test_vec, create_int(n));
         printf("%d,%d\n", n, vector_steps(test_vec));
