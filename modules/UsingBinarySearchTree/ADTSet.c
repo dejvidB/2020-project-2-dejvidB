@@ -7,7 +7,7 @@
 #include <assert.h>
 
 #include "ADTBList.h"
-#include "private_ADTBList.h" 	// Περιέχει την δήλωση της συνάρτησης last_inserted_node
+#include "private_ADTBList.h" 	// Περιέχει την δήλωση της συνάρτησης blist_last_inserted
 #include "ADTSet.h"
 
 // Υλοποιούμε τον ADT Set μέσω BST, οπότε το struct set είναι ένα Δυαδικό Δέντρο Αναζήτησης.

@@ -13,12 +13,16 @@ void real();
 void amortized();
 
 int main(int argc, char **argv){
+    if(argc < 2){
+        printf("Wrong usage.\nvector_insert_steps <type>, <type> = real | amortized\n");
+        return 1;
+    }
     if(strcmp(argv[1], "real") == 0){
         real();
     }else if(strcmp(argv[1], "amortized") == 0){
         amortized();
     }else{
-        printf("Wrong usage.\nvector_insert_steps <type>, type> = real | amortized");
+        printf("Wrong parameter. Use real | amortized\n");
         return 1;
     }
     return 0;
@@ -26,7 +30,7 @@ int main(int argc, char **argv){
 
 void real(){
     Vector test_vec = vector_create(0, free);
-    vector_insert_last(test_vec, create_int(0)); //there must be one element on first insertion
+    vector_insert_last(test_vec, create_int(0)); // Πρέπει να υπάρχει ένα στοιχείο ήδη όταν γίνει vector_insert_last στην for
     for(int n = 1; n <= 10000; n++){
         vector_insert_last(test_vec, create_int(n));
         printf("%d,%d\n", n, vector_steps(test_vec));

@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "private_ADTBList.h" 	// Περιέχει την δήλωση της συνάρτησης last_inserted_node
+#include "private_ADTBList.h" 	// Περιέχει την δήλωση της συνάρτησης blist_last_inserted
 #include "ADTBList.h"
 
 // Ενα BList είναι pointer σε αυτό το struct
