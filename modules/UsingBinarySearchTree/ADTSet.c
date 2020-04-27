@@ -7,6 +7,7 @@
 #include <assert.h>
 
 #include "ADTBList.h"
+#include "private_ADTBList.h" 	// Περιέχει την δήλωση της συνάρτησης last_inserted_node
 #include "ADTSet.h"
 
 // Υλοποιούμε τον ADT Set μέσω BST, οπότε το struct set είναι ένα Δυαδικό Δέντρο Αναζήτησης.
@@ -93,8 +94,8 @@ static SetNode node_insert(Set set, SetNode node, CompareFunc compare, Pointer v
 		BListNode temp = blist_first(set->blist);
 		while(temp != BLIST_EOF && set->compare(value, ((SetNode)blist_node_value(set->blist, temp))->value) > 0)
 			temp = blist_next(set->blist, temp);
-		new_set_node->blistnode = blist_insert(set->blist, temp, new_set_node);
-
+		blist_insert(set->blist, temp, new_set_node);
+		new_set_node->blistnode = blist_last_inserted(set->blist);
 		return new_set_node;
 	}
 

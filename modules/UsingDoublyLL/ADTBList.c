@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "private_ADTBList.h" 	// Περιέχει την δήλωση της συνάρτησης last_inserted_node
 #include "ADTBList.h"
-
 
 // Ενα BList είναι pointer σε αυτό το struct
 struct blist {
@@ -16,6 +16,7 @@ struct blist {
 	BListNode last;				// δείκτης στον τελευταίο κόμβο, ή στον dummy (αν η λίστα είναι κενή)
 	int size;					// μέγεθος, ώστε η list_size να είναι Ο(1)
 	DestroyFunc destroy_value;	// Συνάρτηση που καταστρέφει ένα στοιχείο της λίστας.
+	BListNode last_inserted;	// Ο κόμβος που εισήχθη τελευταίος στην blist
 };
 
 struct blist_node {
@@ -23,6 +24,10 @@ struct blist_node {
 	BListNode previous; // Δείκτης στον προηγούμενο
 	Pointer value;		// Η τιμή που αποθηκεύουμε στον κόμβο
 };
+
+BListNode blist_last_inserted(BList blist){
+	return blist->last_inserted;
+}
 
 BList blist_create(DestroyFunc destroy_value) {
 	// Πρώτα δημιουργούμε το stuct
@@ -46,7 +51,7 @@ int blist_size(BList blist) {
 	return blist->size;
 }
 
-BListNode blist_insert(BList blist, BListNode node, Pointer value) {
+void blist_insert(BList blist, BListNode node, Pointer value) {
 	// Δημιουργία του νέου κόμβου
 	BListNode new = malloc(sizeof(*new));
 	new->value = value;
@@ -72,8 +77,8 @@ BListNode blist_insert(BList blist, BListNode node, Pointer value) {
 		node->previous = new;
 	}
 	// Ενημέρωση του size
+	blist->last_inserted = new;
 	blist->size++;
-	return new;
 }
 
 void blist_remove(BList blist, BListNode node) {

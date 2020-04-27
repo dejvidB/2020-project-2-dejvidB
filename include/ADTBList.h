@@ -39,8 +39,7 @@ int blist_size(BList blist);
 
 // Προσθέτει έναν νέο κόμβο __πριν__ τον node (δηλαδή αν ο node είχε θέση i στη λίστα, o νέος κόμβος
 // παίρνει τη θέση i και ο node πηγαίνει στην i+1), ή στo τέλος αν node == BLIST_EOF, με περιεχόμενο value.
-// Επιστρέφει τον BListNode που μόλις εισήχθη στην λίστα.
-BListNode blist_insert(BList blist, BListNode node, Pointer value);
+void blist_insert(BList blist, BListNode node, Pointer value);
 
 // Αφαιρεί τον κόμβο node (πρέπει να υπάρχει στη λίστα).
 
