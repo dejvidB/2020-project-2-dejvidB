@@ -15,6 +15,7 @@ struct priority_queue {
 	Vector vector;				// Τα δεδομένα, σε Vector ώστε να έχουμε μεταβλητό μέγεθος χωρίς κόπο
 	CompareFunc compare;		// Η διάταξη
 	DestroyFunc destroy_value;	// Συνάρτηση που καταστρέφει ένα στοιχείο του vector.
+	int steps_counter;			// Μετρητής βημάτων συναρτήσεων
 };
 
 // Ενα PriorityQueueNode είναι pointer σε αυτό το struct
@@ -76,6 +77,7 @@ static void bubble_up(PriorityQueue pqueue, int node_id) {
 	if (pqueue->compare(node_value(pqueue, parent), node_value(pqueue, node_id)) < 0) {
 		node_swap(pqueue, parent, node_id);
 		bubble_up(pqueue, parent);
+		pqueue->steps_counter++; // Αυξάνουμε τον μετρητή, όσες φορές γίνεται bubble up
 	}
 }
 
@@ -88,8 +90,9 @@ static void bubble_down(PriorityQueue pqueue, int node_id) {
 	// βρίσκουμε τα παιδιά του κόμβου (αν δεν υπάρχουν σταματάμε)
 	int left_child = 2 * node_id;
 	int right_child = left_child + 1;
-
+	int old = pqueue->steps_counter; // Κρατάμε τα βήματα γιατί το pqueue_size αρχικοποιεί τον μετρητή
 	int size = pqueue_size(pqueue);
+	pqueue->steps_counter = old;
 	if (left_child > size)
 		return;
 
@@ -102,19 +105,23 @@ static void bubble_down(PriorityQueue pqueue, int node_id) {
 	if (pqueue->compare(node_value(pqueue, node_id), node_value(pqueue, max_child)) < 0) {
 		node_swap(pqueue, node_id, max_child);
 		bubble_down(pqueue, max_child);
+		pqueue->steps_counter++; // Αυξάνουμε τον μετρητή όσες φορές γίνεται bubble_down
 	}
 }
 
 static void efficient_heapify(PriorityQueue pqueue, Vector values){
+	int pq_size = pqueue_size(pqueue);
 	for (int i = 0; i < vector_size(values); i++){
 		PriorityQueueNode node = malloc(sizeof(PriorityQueueNode));
 		node->value = vector_get_at(values, i);
-		node->position = pqueue_size(pqueue) + 1;
+		node->position = pq_size + 1;
 		vector_insert_last(pqueue->vector, node);
+		pqueue->steps_counter += vector_steps(pqueue->vector);
 	}
-	for(int i = pqueue_size(pqueue) / 2; i >= 1; i--){
+	for(int i = pq_size / 2; i >= 1; i--){
 		bubble_down(pqueue, i);
 	}
+	pqueue->steps_counter += vector_size(values) / 2;
 }
 
 // Συναρτήσεις του ADTPriorityQueue //////////////////////////////////////////////////
@@ -130,7 +137,7 @@ PriorityQueue pqueue_create(CompareFunc compare, DestroyFunc destroy_value, Vect
 	// ΠΡΟΣΟΧΗ: ΔΕΝ περνάμε την destroy_value στο vector!
 	// Αν την περάσουμε θα καλείται όταν κάνουμε swap 2 στοιχεία, το οποίο δεν το επιθυμούμε.
 	pqueue->vector = vector_create(0, NULL);
-
+	pqueue->steps_counter = 1; // Αρχικοποίηση μετρητή
 	// Αν values != NULL, αρχικοποιούμε το σωρό.
 	if (values != NULL)
 		efficient_heapify(pqueue, values);
@@ -139,10 +146,12 @@ PriorityQueue pqueue_create(CompareFunc compare, DestroyFunc destroy_value, Vect
 }
 
 int pqueue_size(PriorityQueue pqueue) {
+	pqueue->steps_counter = 1;
 	return vector_size(pqueue->vector);
 }
 
 Pointer pqueue_max(PriorityQueue pqueue) {
+	pqueue->steps_counter = 1;
 	return node_value(pqueue, 1);		// root
 }
 
@@ -152,7 +161,7 @@ PriorityQueueNode pqueue_insert(PriorityQueue pqueue, Pointer value) {
 	node->position = pqueue_size(pqueue) + 1;
 	// Προσθέτουμε την τιμή στο τέλος το σωρού
 	vector_insert_last(pqueue->vector, node);
-
+	pqueue->steps_counter = vector_steps(pqueue->vector);
  	// Ολοι οι κόμβοι ικανοποιούν την ιδιότητα του σωρού εκτός από τον τελευταίο, που μπορεί να είναι
 	// μεγαλύτερος από τον πατέρα του. Αρα μπορούμε να επαναφέρουμε την ιδιότητα του σωρού καλώντας
 	// τη bubble_up γα τον τελευταίο κόμβο (του οποίου το 1-based id ισούται με το νέο μέγεθος του σωρού).
@@ -171,11 +180,10 @@ void pqueue_remove_max(PriorityQueue pqueue) {
 
 	// Αντικαθιστούμε τον πρώτο κόμβο με τον τελευταίο και αφαιρούμε τον τελευταίο
 	node_swap(pqueue, 1, last_node);
-	//free(pqnode(pqueue, last_node));
 	vector_set_destroy_value(pqueue->vector, free);
 	vector_remove_last(pqueue->vector);
 	vector_set_destroy_value(pqueue->vector, NULL);
-
+	pqueue->steps_counter = 1;
  	// Ολοι οι κόμβοι ικανοποιούν την ιδιότητα του σωρού εκτός από τη νέα ρίζα
  	// που μπορεί να είναι μικρότερη από κάποιο παιδί της. Αρα μπορούμε να
  	// επαναφέρουμε την ιδιότητα του σωρού καλώντας τη bubble_down για τη ρίζα.
@@ -183,12 +191,14 @@ void pqueue_remove_max(PriorityQueue pqueue) {
 }
 
 DestroyFunc pqueue_set_destroy_value(PriorityQueue pqueue, DestroyFunc destroy_value) {
+	pqueue->steps_counter = 1;
 	DestroyFunc old = pqueue->destroy_value;
 	pqueue->destroy_value = destroy_value;
 	return old;
 }
 
 void pqueue_destroy(PriorityQueue pqueue) {
+	pqueue->steps_counter = 1;
 	VectorNode temp = vector_first(pqueue->vector);
 	while(temp != VECTOR_EOF){
 			VectorNode node = temp;
@@ -196,6 +206,7 @@ void pqueue_destroy(PriorityQueue pqueue) {
 			if(pqueue->destroy_value != NULL)
 				pqueue->destroy_value(((PriorityQueueNode)vector_node_value(pqueue->vector, node))->value);
 			free(vector_node_value(pqueue->vector, node));
+			pqueue->steps_counter++;
 	}
 	vector_set_destroy_value(pqueue->vector, NULL);
 	vector_destroy(pqueue->vector);
@@ -206,6 +217,7 @@ void pqueue_destroy(PriorityQueue pqueue) {
 //// Νέες συναρτήσεις για την εργασία 2 //////////////////////////////////////////
 
 Pointer pqueue_node_value(PriorityQueue set, PriorityQueueNode node) {
+	set->steps_counter = 1;
 	return node->value;
 }
 
@@ -215,14 +227,20 @@ void pqueue_remove_node(PriorityQueue pqueue, PriorityQueueNode node) {
 	pqueue->destroy_value(node->value);
 	free(node);
 	vector_remove_last(pqueue->vector); // Αφαίρεση node που πλέον βρίσκεται στο τέλος
+	pqueue->steps_counter = 1;
 	if(pqueue_size(pqueue))  // Αν η λίστα περιέχει στοιχεία
 		pqueue_update_order(pqueue, pqnode(pqueue, pos)); // Update_order στον προηγούμενο παλιό κόμβο που ανταλλάχθηκε
 }
 
 void pqueue_update_order(PriorityQueue pqueue, PriorityQueueNode node) {
+	pqueue->steps_counter = 1;
 	// Αν τιμή του κόμβου είναι μεγαλύτερη απ την τιμή του parent, bubble_up, αλλιώς bubble_down
 	if(node->position > 1 && node_value(pqueue, node->position) > node_value(pqueue, node->position / 2))
 		bubble_up(pqueue, node->position);
 	else
 		bubble_down(pqueue, node->position);
+}
+
+int pqueue_steps(PriorityQueue pqueue){
+	return pqueue->steps_counter;
 }

@@ -83,3 +83,8 @@ void pqueue_remove_node(PriorityQueue pqueue, PriorityQueueNode node);
 // - η κλήση οποιασδήποτε άλλης συνάρτησης pqueue_*
 
 void pqueue_update_order(PriorityQueue pqueue, PriorityQueueNode node);
+
+// Επιστρέφει τον αριθμό βημάτων που πραγματοποίησε η τελευταία εντολή
+// pqueue_* που κλήθηκε (όποια και να ήταν αυτή).
+
+int pqueue_steps(PriorityQueue pqueue);
