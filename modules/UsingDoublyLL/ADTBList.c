@@ -43,6 +43,7 @@ BList blist_create(DestroyFunc destroy_value) {
 	blist->dummy->previous = NULL;  // και σίγουρα δεν έχει πρηγούμενο
 	// Σε μια κενή λίστα, τελευταίος κόμβος είναι επίσης ο dummy
 	blist->last = blist->dummy;
+	blist->last_inserted = NULL;
 
 	return blist;
 }
