@@ -305,22 +305,27 @@ void set_remove_node(Set set, SetNode node){
 	assert(node != NULL);
 	if(node->left == NULL || node->right == NULL){ // Αν έχει κανένα ή το πολύ ένα παιδί
 		SetNode node_child = node->left != NULL ? node->left : node->right;
-		if(node->parent != NULL && node->parent->left == node){
-			node->parent->left = node_child;
+		if(node == set->root){
+			set->root = node_child;
 		}else{
-			node->parent->right = node_child;
+			if(node->parent->left == node){
+				node->parent->left = node_child;
+			}else{
+				node->parent->right = node_child;
+			}
 		}
 		if(node_child != NULL)
 			node_child->parent = node->parent;
 		if(set->destroy_value != NULL)
 			set->destroy_value(node->value);
 		free(node);
+		set->size--;
 	}else{
 		SetNode node_next = set_next(set, node) != NULL ? set_next(set, node) : set_previous(set, node);
-		if(node_next != NULL){
-			node->value = node_next->value;
-			set_remove_node(set, node_next);
-		}
+		Pointer value = node->value;
+		node->value = node_next->value;
+		node_next->value = value;
+		set_remove_node(set, node_next);
 	}
 }
 
