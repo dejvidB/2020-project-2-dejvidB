@@ -22,6 +22,7 @@ struct set {
 // Ενώ το struct set_node είναι κόμβος ενός Δυαδικού Δέντρου Αναζήτησης
 struct set_node {
 	SetNode left, right;		// Παιδιά
+	SetNode parent;
 	Pointer value;
 	BListNode blistnode;		// Το BListNode που αντιπροσωπεύει τον SetNode στη set->blist
 };
@@ -111,11 +112,15 @@ static SetNode node_insert(Set set, SetNode node, CompareFunc compare, Pointer v
 
 	} else if (compare_res < 0) {
 		// value < node->value, συνεχίζουμε αριστερά.
-		node->left = node_insert(set, node->left, compare, value, inserted, old_value);
+		SetNode new_node = node_insert(set, node->left, compare, value, inserted, old_value);
+		node->left = new_node;
+		new_node->parent = node;
 
 	} else {
 		// value > node->value, συνεχίζουμε δεξιά
-		node->right = node_insert(set, node->right, compare, value, inserted, old_value);
+		SetNode new_node = node_insert(set, node->right, compare, value, inserted, old_value);
+		node->right = new_node;
+		new_node->parent = node;
 	}
 
 	return node;	// η ρίζα του υποδέντρου δεν αλλάζει
@@ -294,6 +299,29 @@ Pointer set_node_value(Set set, SetNode node) {
 
 SetNode set_find_node(Set set, Pointer value) {
 	return node_find_equal(set->root, set->compare, value);
+}
+
+void set_remove_node(Set set, SetNode node){
+	assert(node != NULL);
+	if(node->left == NULL || node->right == NULL){ // Αν έχει κανένα ή το πολύ ένα παιδί
+		SetNode node_child = node->left != NULL ? node->left : node->right;
+		if(node->parent != NULL && node->parent->left == node){
+			node->parent->left = node_child;
+		}else{
+			node->parent->right = node_child;
+		}
+		if(node_child != NULL)
+			node_child->parent = node->parent;
+		if(set->destroy_value != NULL)
+			set->destroy_value(node->value);
+		free(node);
+	}else{
+		SetNode node_next = set_next(set, node) != NULL ? set_next(set, node) : set_previous(set, node);
+		if(node_next != NULL){
+			node->value = node_next->value;
+			set_remove_node(set, node_next);
+		}
+	}
 }
 
 

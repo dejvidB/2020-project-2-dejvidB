@@ -250,6 +250,31 @@ void test_iterate() {
 	set_destroy(set);
 }
 
+void test_remove_node(){
+	Set set = set_create(compare_ints, free);
+	int N = 1000;
+	SetNode value_array[N];
+	for (int i = 0; i < N; i++){
+		set_insert(set, create_int(i));
+		value_array[i] = set_find_node(set, &i);
+	}
+	TEST_ASSERT(set_size(set) == N);
+
+	for(int i = 0; i < N; i+=2){
+		set_remove_node(set, value_array[i]);
+	}
+
+	TEST_ASSERT(set_size(set) == N / 2);
+
+	for(int i = 0; i < N; i++){
+		if(i % 2 == 0)
+			TEST_ASSERT(set_find_node(set, &i) == NULL);
+		else
+			TEST_ASSERT(set_find_node(set, &i) != NULL);
+	}
+
+	set_destroy(set);
+}
 
 // Λίστα με όλα τα tests προς εκτέλεση
 TEST_LIST = {
@@ -257,6 +282,7 @@ TEST_LIST = {
 	{ "set_insert", test_insert },
 	{ "set_remove", test_remove },
 	{ "set_find", 	test_find 	},
-	{ "set_iterate",test_iterate 	},
+	{ "set_iterate",test_iterate},
+	{ "set_remove_node", test_remove_node},
 	{ NULL, NULL } // τερματίζουμε τη λίστα με NULL
 };
