@@ -251,27 +251,41 @@ void test_iterate() {
 }
 
 void test_remove_node(){
-	Set set = set_create(compare_ints, free);
+	Set set = set_create(compare_ints, NULL);
 	int N = 1000;
-	SetNode value_array[N];
+
+	int* value_array[N];
+	for (int i = 0; i < N; i++)
+		value_array[i] = create_int(i);
+
+	// εισαγωγή τιμών σε τυχαία σειρά
+	shuffle(value_array, N);
+
+	for (int i = 0; i < N; i++)
+		set_insert(set, value_array[i]);
+
+	SetNode nodes[N];
 	for (int i = 0; i < N; i++){
-		set_insert(set, create_int(i));
-		value_array[i] = set_find_node(set, &i);
+		set_insert(set, value_array[i]);
+		nodes[i] = set_find_node(set, &i);
 	}
 	TEST_ASSERT(set_size(set) == N);
 
 	for(int i = 0; i < N; i+=2){
-		set_remove_node(set, value_array[i]);
+		set_remove_node(set, nodes[i]);
 	}
 
 	TEST_ASSERT(set_size(set) == N / 2);
 
 	for(int i = 0; i < N; i++){
 		if(i % 2 == 0)
-			TEST_ASSERT(set_find_node(set, &i) == NULL);
+			TEST_ASSERT(set_find_node(set, value_array[i]) == NULL);
 		else
-			TEST_ASSERT(set_find_node(set, &i) != NULL);
+			TEST_ASSERT(set_find_node(set, value_array[i]) != NULL);
 	}
+
+	for(int i = 0; i < N; i++)
+		free(value_array[i]);
 
 	set_destroy(set);
 }
