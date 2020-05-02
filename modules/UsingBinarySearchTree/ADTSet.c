@@ -318,14 +318,17 @@ void set_remove_node(Set set, SetNode node){
 			node_child->parent = node->parent;
 		if(set->destroy_value != NULL)
 			set->destroy_value(node->value);
+		blist_remove(set->blist, node->blistnode);
 		free(node);
 		set->size--;
 	}else{
-		SetNode node_next = set_next(set, node) != NULL ? set_next(set, node) : set_previous(set, node);
+		SetNode exchange = set_next(set, node) != NULL ? set_next(set, node) : set_previous(set, node);
+
 		Pointer value = node->value;
-		node->value = node_next->value;
-		node_next->value = value;
-		set_remove_node(set, node_next);
+		node->value = exchange->value;
+		exchange->value = node->value;
+
+		set_remove_node(set, node);
 	}
 }
 

@@ -261,18 +261,13 @@ void test_remove_node(){
 	// εισαγωγή τιμών σε τυχαία σειρά
 	shuffle(value_array, N);
 
-	for (int i = 0; i < N; i++)
-		set_insert(set, value_array[i]);
-
-	SetNode nodes[N];
 	for (int i = 0; i < N; i++){
 		set_insert(set, value_array[i]);
-		nodes[i] = set_find_node(set, &i);
 	}
 	TEST_ASSERT(set_size(set) == N);
 
-	for(int i = 0; i < N; i+=2){
-		set_remove_node(set, nodes[i]);
+	for(int i = 0; i < N; i += 2){
+		set_remove_node(set, set_find_node(set, value_array[i]));
 	}
 
 	TEST_ASSERT(set_size(set) == N / 2);
