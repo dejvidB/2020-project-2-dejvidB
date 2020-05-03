@@ -89,10 +89,10 @@ static SetNode node_insert(Set set, SetNode node, CompareFunc compare, Pointer v
 	if (node == NULL) {
 		*inserted = true;			// κάναμε προσθήκη
         SetNode new_node = node_create(value);
-        if(set->first == NULL || compare(set->first->value, value) < 0){
+        if(set->first == NULL || compare(value, set->first->value) < 0){
             set->first = new_node;
         }
-        if(set->last == NULL || compare(set->last->value, value) > 0){
+        if(set->last == NULL || compare(value, set->last->value) > 0){
             set->last = new_node;
         }
 		return new_node;
@@ -151,7 +151,7 @@ static SetNode node_remove_min(SetNode node, SetNode* min_node) {
 // Διαγράφει το κόμβο με τιμή ισοδύναμη της value, αν υπάρχει. Επιστρέφει τη νέα ρίζα του
 // υποδέντρου, και θέτει το *removed σε true αν έγινε πραγματικά διαγραφή.
 
-static SetNode node_remove(SetNode node, CompareFunc compare, Pointer value, bool* removed, Pointer* old_value) {
+static SetNode node_remove(Set set, SetNode node, CompareFunc compare, Pointer value, bool* removed, Pointer* old_value) {
 	if (node == NULL) {
 		*removed = false;		// κενό υποδέντρο, δεν υπάρχει η τιμή
 		return NULL;
@@ -168,6 +168,12 @@ static SetNode node_remove(SetNode node, CompareFunc compare, Pointer value, boo
             node->next->previous = node->previous;
         if(node->previous != NULL)
             node->previous->next = node->next;
+
+        //Ανανέωση set_first, set_last
+        if(node == set->first)
+            set->first = node->next;
+        if(node == set->last)
+            set->last = node->previous;
 
 		if (node->left == NULL) {
 			// Δεν υπάρχει αριστερό υποδέντρο, οπότε διαγράφεται απλά ο κόμβος και νέα ρίζα μπαίνει το δεξί παιδί
@@ -199,9 +205,9 @@ static SetNode node_remove(SetNode node, CompareFunc compare, Pointer value, boo
 
 	// compare_res != 0, συνεχίζουμε στο αριστερό ή δεξί υποδέντρο, η ρίζα δεν αλλάζει.
 	if (compare_res < 0)
-		node->left  = node_remove(node->left,  compare, value, removed, old_value);
+		node->left  = node_remove(set, node->left,  compare, value, removed, old_value);
 	else
-		node->right = node_remove(node->right, compare, value, removed, old_value);
+		node->right = node_remove(set, node->right, compare, value, removed, old_value);
 
 	return node;
 }
@@ -259,7 +265,7 @@ void set_insert(Set set, Pointer value) {
 bool set_remove(Set set, Pointer value) {
 	bool removed;
 	Pointer old_value = NULL;
-	set->root = node_remove(set->root, set->compare, value, &removed, &old_value);
+	set->root = node_remove(set, set->root, set->compare, value, &removed, &old_value);
 	// Το size αλλάζει μόνο αν πραγματικά αφαιρεθεί ένας κόμβος
 	if (removed) {
 		set->size--;
