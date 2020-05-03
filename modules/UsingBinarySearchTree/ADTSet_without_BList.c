@@ -88,7 +88,14 @@ static SetNode node_insert(Set set, SetNode node, CompareFunc compare, Pointer v
 	// Αν το υποδέντρο είναι κενό, δημιουργούμε νέο κόμβο ο οποίος γίνεται ρίζα του υποδέντρου
 	if (node == NULL) {
 		*inserted = true;			// κάναμε προσθήκη
-		return node_create(value);
+        SetNode new_node = node_create(value);
+        if(set->first == NULL || compare(set->first->value, value) < 0){
+            set->first = new_node;
+        }
+        if(set->last == NULL || compare(set->last->value, value) > 0){
+            set->last = new_node;
+        }
+		return new_node;
 	}
 
 	// Το που θα γίνει η προσθήκη εξαρτάται από τη διάταξη της τιμής
