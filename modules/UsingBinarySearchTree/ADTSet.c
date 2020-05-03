@@ -304,31 +304,30 @@ SetNode set_find_node(Set set, Pointer value) {
 void set_remove_node(Set set, SetNode node){
 	assert(node != NULL);
 	if(node->left == NULL || node->right == NULL){ // Αν έχει κανένα ή το πολύ ένα παιδί
-		SetNode node_child = node->left != NULL ? node->left : node->right;
+		SetNode node_child = node->left != NULL ? node->left : node->right; // Επιστρέφει το παιδί του κόμβου, ή NULL αν δεν έχει
 		if(node == set->root){
-			set->root = node_child;
+			set->root = node_child; // Ενημέρωση "ρίζας" αν ο node είναι η ρίζα
 		}else{
-			if(node->parent->left == node){
+			if(node->parent->left == node){	//Αλλιώς, σύνδεση σύνδεση parent -> node_child
 				node->parent->left = node_child;
 			}else{
 				node->parent->right = node_child;
 			}
 		}
 		if(node_child != NULL)
-			node_child->parent = node->parent;
+			node_child->parent = node->parent;  // Αν ο κόμβος είχε "παιδί", σύνδεση node_child -> parent
 		if(set->destroy_value != NULL)
 			set->destroy_value(node->value);
-		blist_remove(set->blist, node->blistnode);
+		blist_remove(set->blist, node->blistnode);	// Αφαίρεση κόμβου από την set->blist
 		free(node);
-		set->size--;
-	}else{
+		set->size--; // Ενημέρωση size
+	}else{	// Αν έχει δύο παιδιά, άλλαξε τον κόμβο είτε με τον επόμενο είτε με τον προηγούμενο κόμβο
 		SetNode exchange = set_next(set, node) != NULL ? set_next(set, node) : set_previous(set, node);
-
-		Pointer value = node->value;
+		// Ανταλλαγή value του κόμβου με το value του επόμενου/προηγούμενου
+		Pointer temp = node->value;
 		node->value = exchange->value;
-		exchange->value = node->value;
-
-		set_remove_node(set, node);
+		exchange->value = temp;
+		set_remove_node(set, exchange); // Αναδρομική κλήση συνάρτησης με όρισμα τον node που περιέχει το value που θέλουμε να αφαιρέσουμε
 	}
 }
 
