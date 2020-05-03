@@ -89,6 +89,7 @@ static SetNode node_insert(Set set, SetNode node, CompareFunc compare, Pointer v
 	if (node == NULL) {
 		*inserted = true;			// κάναμε προσθήκη
         SetNode new_node = node_create(value);
+        // Ενημέρωση set->first και set->last
         if(set->first == NULL || compare(value, set->first->value) < 0){
             set->first = new_node;
         }
@@ -114,8 +115,9 @@ static SetNode node_insert(Set set, SetNode node, CompareFunc compare, Pointer v
 		node->left = new_node;
 		new_node->parent = node;
 
+        // Ο κόμβος προστέθηκε αριστερά, άρα ενημέρωση node->previous
         SetNode node_prev = node_find_max(new_node);
-        node->previous = node_prev; // Ενημέρωση previous
+        node->previous = node_prev;
         node_prev->next = node;
 	} else {
 		// value > node->value, συνεχίζουμε δεξιά
@@ -123,8 +125,9 @@ static SetNode node_insert(Set set, SetNode node, CompareFunc compare, Pointer v
 		node->right = new_node;
 		new_node->parent = node;
 
+        // Ο κόμβος προστέθηκε δεξιά, άρα ενημέρωση node->next
         SetNode node_next = node_find_min(new_node);
-        node->next =  node_next; // Ενημέρωση next
+        node->next =  node_next;
         node_next->previous = node;
 	}
 
@@ -334,11 +337,16 @@ void set_remove_node(Set set, SetNode node){
 		if(set->destroy_value != NULL)
 			set->destroy_value(node->value);
 
-        //Σύνδεση node->next <-> node->previous
+        // Σύνδεση node->next <-> node->previous
         if(node->next != NULL)
             node->next->previous = node->previous;
         if(node->previous != NULL)
             node->previous->next = node->next;
+        // Ενημέρωση set->first και set->last
+        if(node == set->first)
+            set->first = node->next;
+        if(node == set->last)
+            set->last = node->previous;
 
 		free(node);
 		set->size--; // Ενημέρωση size
