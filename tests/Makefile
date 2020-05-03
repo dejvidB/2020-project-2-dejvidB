@@ -14,8 +14,9 @@ UsingDoublyLL_ADTBList_test_OBJS        = ADTBList_test.o $(MODULES)/UsingDoubly
 #
 UsingHeap_ADTPriorityQueue_test_OBJS    = ADTPriorityQueue_test.o $(MODULES)/UsingHeap/ADTPriorityQueue.o $(MODULES)/UsingDynamicArray/ADTVector.o
 
-# Υλοποιήσεις μέσω BinarySearchTree: ADTSet
+# Υλοποιήσεις μέσω BinarySearchTree: ADTSet, ADTSet_without_BList
 UsingBinarySearchTree_ADTSet_test_OBJS  = ADTSet_test.o $(MODULES)/UsingBinarySearchTree/ADTSet.o $(MODULES)/UsingDoublyLL/ADTBList.o
+UsingBinarySearchTree_ADTSet_without_BList_test_OBJS  = ADTSet_test.o $(MODULES)/UsingBinarySearchTree/ADTSet_without_BList.o
 
 # Υλοποιήσεις μέσω Set: ADTPriorityQueue
 UsingADTSet_ADTPriorityQueue_test_OBJS  =  ADTPriorityQueue_test.o $(MODULES)/UsingADTSet/ADTPriorityQueue.o $(MODULES)/UsingBinarySearchTree/ADTSet.o $(MODULES)/UsingDynamicArray/ADTVector.o $(MODULES)/UsingDoublyLL/ADTBList.o
